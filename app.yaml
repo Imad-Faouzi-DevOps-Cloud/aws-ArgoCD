@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: "https://github.com/TON_REPO.git"
+    repoURL: "https://https://github.com/Imad-Faouzi-DevOps-Cloud/aws-ArgoCD"
     targetRevision: main
     path: app-manifests
   destination:
