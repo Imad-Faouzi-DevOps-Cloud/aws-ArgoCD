@@ -1,0 +1,36 @@
+stages:
+  - deploy
+
+variables:
+  KUBECONFIG: "/root/.kube/config"
+
+deploy-dev:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - kubectl config set-cluster my-cluster --server=https://kubernetes.default.svc
+    - kubectl config set-credentials admin --token=$KUBE_TOKEN
+    - kubectl config set-context default --cluster=my-cluster --user=admin
+    - kubectl config use-context default
+    - argocd login $ARGOCD_SERVER --username $ARGOCD_USER --password $ARGOCD_PASSWORD --insecure
+    - argocd app sync my-app-dev
+  only:
+    - main
+
+deploy-staging:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - argocd login $ARGOCD_SERVER --username $ARGOCD_USER --password $ARGOCD_PASSWORD --insecure
+    - argocd app sync my-app-staging
+  only:
+    - main
+
+deploy-prod:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  script:
+    - argocd login $ARGOCD_SERVER --username $ARGOCD_USER --password $ARGOCD_PASSWORD --insecure
+    - argocd app sync my-app-prod
+  only:
+    - tags
