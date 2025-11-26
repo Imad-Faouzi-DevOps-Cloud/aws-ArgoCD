@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-app-ingress
+  namespace: default
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "selfsigned-issuer"
+spec:
+  tls:
+    - hosts:
+        - ada7f0225b1d34825a5f93763e8d1f17-993905552.eu-north-1.elb.amazonaws.com
+      secretName: my-app-tls
+  rules:
+    - host: ada7f0225b1d34825a5f93763e8d1f17-993905552.eu-north-1.elb.amazonaws.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-app
+                port:
+                  number: 80
+
