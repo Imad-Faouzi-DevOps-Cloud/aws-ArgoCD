@@ -1,19 +1,22 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-app-dev
+  name: myapp-dev
   namespace: argocd
 spec:
   project: default
+
   source:
-    repoURL: https://github.com/Imad-Faouzi-DevOps-Cloud/aws-ArgoCD
+    repoURL: https://github.com/Imad-Faouzi-DevOps-Cloud/aws-ArgoCD.git
     targetRevision: dev
-    path: dev/app-manifests
+    path: overlays/dev
+
   destination:
     server: https://kubernetes.default.svc
     namespace: dev
+
   syncPolicy:
     automated:
-      selfHeal: true
       prune: true
+      selfHeal: true
 
