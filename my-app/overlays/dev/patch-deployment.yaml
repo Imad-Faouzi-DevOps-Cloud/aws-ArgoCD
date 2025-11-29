@@ -3,10 +3,5 @@ kind: Deployment
 metadata:
   name: my-app
 spec:
-  replicas: 2
-  template:
-    spec:
-      containers:
-        - name: my-app
-          image: my-app:dev
+  replicas: 2  # par exemple, nombre de replicas pour dev
 
