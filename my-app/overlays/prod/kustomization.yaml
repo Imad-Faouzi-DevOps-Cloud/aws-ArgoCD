@@ -5,5 +5,5 @@ resources:
   - ../../base
 
 patches:
-  - patch-deployment.yaml
-
+  - path: patch-deployment.yaml
+   

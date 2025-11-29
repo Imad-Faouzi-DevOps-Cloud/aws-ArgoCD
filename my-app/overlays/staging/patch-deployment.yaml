@@ -8,5 +8,4 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: my-app:dev
-
+          image: my-app:staging
