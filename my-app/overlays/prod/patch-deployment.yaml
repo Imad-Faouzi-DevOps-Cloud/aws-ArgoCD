@@ -8,5 +8,6 @@ spec:
     spec:
       containers:
         - name: my-app
-          image: my-app:prod
-
+          image: 136312924616.dkr.ecr.eu-north-1.amazonaws.com/my-app:prod
+      imagePullSecrets:
+        - name: regcred

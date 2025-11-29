@@ -1,0 +1,6 @@
+nohup: ignoring input
+Forwarding from 127.0.0.1:8080 -> 5000
+Forwarding from [::1]:8080 -> 5000
+Handling connection for 8080
+E1129 20:27:48.539223  211546 portforward.go:424] "Unhandled Error" err="an error occurred forwarding 8080 -> 5000: error forwarding port 5000 to pod 525459ccbef5c26fe15a2b80989ee9e515761ac09fb4c2667c2872e0b7f7242c, uid : failed to execute portforward in network namespace \"/var/run/netns/cni-f369ce1a-757e-4a9f-2d37-a83329ad928f\": failed to connect to localhost:5000 inside namespace \"525459ccbef5c26fe15a2b80989ee9e515761ac09fb4c2667c2872e0b7f7242c\", IPv4: dial tcp4 127.0.0.1:5000: connect: connection refused IPv6 dial tcp6: address localhost: no suitable address found "
+error: lost connection to pod

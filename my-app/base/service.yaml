@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: my-app
 spec:
-  type: ClusterIP
   selector:
     app: my-app
+  type: LoadBalancer  # ou ClusterIP si tu testes local
   ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 5000
+    - port: 80           # port accessible depuis l’extérieur (ELB ou port-forward)
+      targetPort: 5000   # port sur lequel le conteneur écoute réellement
+

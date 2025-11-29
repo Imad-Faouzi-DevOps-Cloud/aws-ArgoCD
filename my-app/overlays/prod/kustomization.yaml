@@ -6,4 +6,9 @@ resources:
 
 patches:
   - path: patch-deployment.yaml
-   
+  - path: patch-service.yaml    
+
+images:
+  - name: my-app
+    newName: 136312924616.dkr.ecr.eu-north-1.amazonaws.com/my-app
+    newTag: prod
