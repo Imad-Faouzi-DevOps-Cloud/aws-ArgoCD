@@ -16,12 +16,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Debug OIDC token
-        run: |
-          curl -H "Authorization: Bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" $ACTIONS_ID_TOKEN_REQUEST_URL
-          env:
-            ACTIONS_ID_TOKEN_REQUEST_TOKEN: ${{ steps.id-token.outputs.token }}
-            ACTIONS_ID_TOKEN_REQUEST_URL: ${{ steps.id-token.outputs.request_url }}
 
       ######################################################
       # 1. Configure AWS Credentials via OIDC
@@ -30,7 +24,6 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::136312924616:role/GithubActionsDeployRole
-
           aws-region: eu-north-1
 
       ######################################################
@@ -74,4 +67,3 @@ jobs:
       - name: Sync ArgoCD Application
         run: |
           argocd app sync my-app
-
