@@ -1,9 +1,13 @@
-name: Deploy to Kubernetes via ArgoCD
+name: Build and Deploy to EKS via ArgoCD
 
 on:
   push:
     branches:
-      - main  # déclenche sur push sur main
+      - main
+
+permissions:
+  id-token: write       # OIDC
+  contents: read
 
 jobs:
   deploy:
@@ -13,17 +17,42 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      ######################################################
+      # 1. Configure AWS Credentials via OIDC
+      ######################################################
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          version: 'v1.28.0'  # adapte selon ta version
+          role-to-assume: arn:aws:iam::<ACCOUNT_ID>:role/<ROLE_NAME>
+          aws-region: eu-north-1
 
-      - name: Set up ArgoCD CLI
+      ######################################################
+      # 2. Login to Amazon ECR
+      ######################################################
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      ######################################################
+      # 3. Build & Push Docker image
+      ######################################################
+      - name: Build, tag and push image
+        run: |
+          IMAGE_URI=136312924616.dkr.ecr.eu-north-1.amazonaws.com/my-app:prod
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+      ######################################################
+      # 4. Install ArgoCD CLI
+      ######################################################
+      - name: Install ArgoCD CLI
         run: |
           curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
           chmod +x argocd
           sudo mv argocd /usr/local/bin/
 
+      ######################################################
+      # 5. ArgoCD Login
+      ######################################################
       - name: Login to ArgoCD
         env:
           ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
@@ -32,7 +61,10 @@ jobs:
         run: |
           argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD --insecure
 
-      - name: Sync application
+      ######################################################
+      # 6. Trigger ArgoCD Sync
+      ######################################################
+      - name: Sync ArgoCD Application
         run: |
           argocd app sync my-app
 
