@@ -38,7 +38,7 @@ jobs:
       - name: Build, tag and push image
         run: |
           IMAGE_URI=136312924616.dkr.ecr.eu-north-1.amazonaws.com/my-app:prod
-          docker build -t $IMAGE_URI .
+          docker build -t $IMAGE_URI -f my-app/Dockerfile my-app/
           docker push $IMAGE_URI
 
       ######################################################
