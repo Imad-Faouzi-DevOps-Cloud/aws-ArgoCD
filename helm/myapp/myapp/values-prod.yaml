@@ -1,0 +1,19 @@
+replicaCount: 3
+
+image:
+  repository: myapp
+  tag: prod
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - host: myapp.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+
