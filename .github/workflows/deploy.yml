@@ -23,7 +23,11 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
+<<<<<<< HEAD
           role-to-assume: arn:aws:iam::136312924616:role/github-actions-ecr2
+=======
+          role-to-assume: arn:aws:iam::136312924616:role/github-actions-ecr2
+>>>>>>> prod
           aws-region: eu-north-1
 
       ######################################################
@@ -38,8 +42,12 @@ jobs:
       - name: Build, tag and push image
         run: |
           IMAGE_URI=136312924616.dkr.ecr.eu-north-1.amazonaws.com/my-app:prod
+<<<<<<< HEAD
           docker build -t $IMAGE_URI -f my-app/Dockerfile my-app/
-          docker push $IMAGE_URI
+=======
+          docker build -t $IMAGE_URI .
+>>>>>>> prod
+          docker push $IMAGE_URI -f my-app/Dockerfile my-app/
 
       ######################################################
       # 4. Install ArgoCD CLI
@@ -64,6 +72,12 @@ jobs:
       ######################################################
       # 6. Trigger ArgoCD Sync
       ######################################################
+<<<<<<< HEAD
 #      - name: Sync ArgoCD Application
 #       run: |
  #         argocd app sync my-app
+=======
+      - name: Sync ArgoCD Application
+        run: |
+          argocd app sync my-app
+>>>>>>> prod

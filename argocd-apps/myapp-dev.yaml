@@ -3,13 +3,17 @@ kind: Application
 metadata:
   name: myapp-dev
   namespace: argocd
+
 spec:
   project: default
 
   source:
     repoURL: https://github.com/Imad-Faouzi-DevOps-Cloud/aws-ArgoCD.git
-    targetRevision: dev
-    path: overlays/dev
+    targetRevision: main
+    path: helm/myapp/myapp
+    helm:
+      valueFiles:
+        - values-dev.yaml
 
   destination:
     server: https://kubernetes.default.svc

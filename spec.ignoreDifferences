@@ -1,0 +1,14 @@
+ignoreDifferences:
+  - group: ""
+    kind: ConfigMap
+    name: argocd-notifications-cm
+    namespace: argocd
+    jsonPointers:
+      - /
+  - group: ""
+    kind: Secret
+    name: argocd-notifications-secret
+    namespace: argocd
+    jsonPointers:
+      - /
+

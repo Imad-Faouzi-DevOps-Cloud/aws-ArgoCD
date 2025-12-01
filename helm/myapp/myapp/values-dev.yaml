@@ -1,0 +1,19 @@
+replicaCount: 1
+
+image:
+  repository: myapp
+  tag: dev
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  hosts:
+    - host: dev.myapp.local
+      paths:
+        - path: /
+          pathType: Prefix
+
