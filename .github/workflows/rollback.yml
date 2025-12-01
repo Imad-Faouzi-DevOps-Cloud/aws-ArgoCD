@@ -1,0 +1,80 @@
+# Pipeline de rollback d'urgence
+# Permet de revenir rapidement à une version précédente
+# Déclenchement manuel uniquement
+
+name: Emergency Rollback
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environnement à rollback'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - production
+      
+      image_tag:
+        description: 'Tag de l image à déployer (ex: prod-abc123)'
+        required: true
+        type: string
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  rollback:
+    name: Rollback ${{ github.event.inputs.environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.environment }}
+    
+    steps:
+      - name: Validate inputs
+        run: |
+          echo "🔄 Rollback demandé:"
+          echo "  Environment: ${{ github.event.inputs.environment }}"
+          echo "  Image tag: ${{ github.event.inputs.image_tag }}"
+      
+      - name: Install ArgoCD CLI
+        run: |
+          curl -sSL -o argocd https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+          chmod +x argocd
+          sudo mv argocd /usr/local/bin/
+      
+      - name: Login to ArgoCD
+        env:
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+          ARGOCD_USERNAME: ${{ secrets.ARGOCD_USERNAME }}
+          ARGOCD_PASSWORD: ${{ secrets.ARGOCD_PASSWORD }}
+        run: |
+          argocd login $ARGOCD_SERVER --username $ARGOCD_USERNAME --password $ARGOCD_PASSWORD --insecure
+      
+      - name: Execute Rollback
+        run: |
+          APP_NAME="my-app-${{ github.event.inputs.environment }}"
+          
+          echo "📍 Current state:"
+          argocd app get ${APP_NAME}
+          
+          echo "🔄 Rolling back to: ${{ github.event.inputs.image_tag }}"
+          argocd app set ${APP_NAME} --parameter image.tag=${{ github.event.inputs.image_tag }}
+          argocd app sync ${APP_NAME}
+          argocd app wait ${APP_NAME} --timeout 300
+          
+          echo "✅ Rollback terminé!"
+      
+      - name: Verify rollback
+        run: |
+          APP_NAME="my-app-${{ github.event.inputs.environment }}"
+          argocd app get ${APP_NAME}
+          echo "📊 Rollback vérifié pour ${APP_NAME}"
+      
+      - name: Notification
+        run: |
+          echo "🚨 ROLLBACK EFFECTUÉ"
+          echo "Environment: ${{ github.event.inputs.environment }}"
+          echo "Version: ${{ github.event.inputs.image_tag }}"
+          # Ajouter notification Slack ici si besoin

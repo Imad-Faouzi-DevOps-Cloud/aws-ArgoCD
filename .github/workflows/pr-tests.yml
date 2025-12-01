@@ -1,0 +1,92 @@
+# Tests automatisés sur Pull Requests
+# Valide le code avant merge
+# Bloque le merge si tests échouent
+
+name: Pull Request Tests
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - staging
+      - main
+
+jobs:
+  # Test 1: Validation syntaxe
+  validate:
+    name: Validate Manifests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Install Kustomize
+        run: |
+          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          sudo mv kustomize /usr/local/bin/
+      
+      - name: Validate DEV
+        run: |
+          echo "🔍 Validation DEV..."
+          kustomize build my-app/overlays/dev > /dev/null
+          echo "✅ DEV OK"
+      
+      - name: Validate STAGING
+        run: |
+          echo "🔍 Validation STAGING..."
+          kustomize build my-app/overlays/staging > /dev/null
+          echo "✅ STAGING OK"
+      
+      - name: Validate PROD
+        run: |
+          echo "🔍 Validation PROD..."
+          kustomize build my-app/overlays/prod > /dev/null
+          echo "✅ PROD OK"
+  
+  # Test 2: Linting Dockerfile
+  lint-docker:
+    name: Lint Dockerfile
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Hadolint (Dockerfile linter)
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: my-app/Dockerfile
+          failure-threshold: warning
+  
+  # Test 3: Security scan
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Run Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: './my-app'
+          format: 'table'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+  
+  # Test 4: Check secrets
+  check-secrets:
+    name: Check for Secrets
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Gitleaks (Secret scanner)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
