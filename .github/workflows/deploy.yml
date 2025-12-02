@@ -83,6 +83,15 @@ jobs:
           sudo mv kustomize /usr/local/bin/
           kustomize build my-app/overlays/${{ needs.build.outputs.environment }}
       
+      - name: Configure AWS Credentials (pour Trivy)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::136312924616:role/github-actions-ecr2
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Login to Amazon ECR (pour Trivy)
+        uses: aws-actions/amazon-ecr-login@v2
+      
       - name: Security scan (Trivy)
         uses: aquasecurity/trivy-action@master
         with:
@@ -129,7 +138,6 @@ jobs:
     if: github.ref == 'refs/heads/staging'
     environment: 
       name: staging
-      # Nécessite approbation manuelle dans GitHub
     
     steps:
       - name: Install ArgoCD CLI
@@ -161,7 +169,6 @@ jobs:
     if: github.ref == 'refs/heads/main'
     environment: 
       name: production
-      # Nécessite approbation manuelle dans GitHub
     
     steps:
       - name: Install ArgoCD CLI
@@ -189,4 +196,3 @@ jobs:
         run: |
           echo "✅ Deployment successful"
           echo "📊 Image: ${{ needs.build.outputs.image_tag }}"
-          # Ajouter health checks ici
